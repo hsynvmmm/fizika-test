@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fizika — Laboratoriya İmtahan Testi</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px 12px 60px;
+    }
+
+    .container { max-width: 980px; margin: 0 auto; }
+
+    header {
+      background: var(--card);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header h1 { font-size: 1.35rem; font-weight: 700; }
+    header p { font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
+
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 16px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { background: #f8fafc; }
+
+    .score-banner {
+      display: none;
+      background: var(--card);
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
+    }
+    .score-banner.show { display: block; }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .stat-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: center;
+    }
+    .stat-box .val { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+    .stat-box .lbl { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+    .filter-bar { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+    .filter-btn { padding: 6px 14px; font-size: 0.85rem; border-radius: 999px; border: 1px solid var(--border); background: #fff; }
+    .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .question-card {
+      background: var(--card);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+    }
+    .question-card.hidden { display: none; }
+
+    .q-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e2e8f0;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .q-title { font-weight: 700; font-size: 1.05rem; color: var(--text); }
+    .q-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .q-status { font-size: 0.85rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+    .status-ok { background: var(--success-bg); color: var(--success); }
+    .status-err { background: var(--danger-bg); color: var(--danger); }
+
+    /* Uyğunluq & Ardıcıllıq Drag-Drop */
+    .match-layout { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px; }
+    @media (max-width: 768px) { .match-layout { grid-template-columns: 1fr; } }
+
+    .col-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+    .premise-list, .pool-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .premise-row {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .premise-text { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+    .premise-num { font-weight: 700; color: var(--primary); min-width: 22px; }
+
+    .drop-zone {
+      min-height: 46px;
+      border: 2px dashed #94a3b8;
+      border-radius: 10px;
+      background: #fff;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: var(--primary-light); }
+    .drop-zone.filled { border-style: solid; border-color: var(--primary); background: #f8fafc; }
+    .drop-zone.correct { border-color: var(--success) !important; background: var(--success-bg) !important; }
+    .drop-zone.wrong { border-color: var(--danger) !important; background: var(--danger-bg) !important; }
+
+    .placeholder-txt { font-size: 0.85rem; color: #94a3b8; user-select: none; }
+
+    .remove-btn {
+      background: #e2e8f0;
+      color: #475569;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      padding: 0;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .remove-btn:hover { background: var(--danger); color: #fff; }
+
+    .drag-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: all 0.15s ease;
+    }
+    .drag-card:hover { border-color: var(--primary); }
+    .drag-card.selected-tap { border: 2px solid var(--primary); background: var(--primary-light); }
+    .drag-card.used { opacity: 0.45; }
+
+    .opt-letter {
+      font-weight: 800;
+      color: #334155;
+      background: #e2e8f0;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    /* Açar sözlər (Cloze) */
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .word-chip {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .word-chip:hover { border-color: var(--primary); color: var(--primary); }
+    .word-chip.selected-tap { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .cloze-text {
+      font-size: 1rem;
+      line-height: 2.1;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .inline-blank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 130px;
+      height: 32px;
+      padding: 0 10px;
+      margin: 0 4px;
+      border: 2px dashed #94a3b8;
+      border-radius: 8px;
+      background: #f8fafc;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary);
+      vertical-align: middle;
+      cursor: pointer;
+    }
+    .inline-blank.filled { border-style: solid; border-color: var(--primary); background: var(--primary-light); }
+    .inline-blank.correct { border-color: var(--success) !important; background: var(--success-bg) !important; color: var(--success) !important; }
+    .inline-blank.wrong { border-color: var(--danger) !important; background: var(--danger-bg) !important; color: var(--danger) !important; }
+
+    /* Çoxseçimli (Multi-select) */
+    .checkbox-list { display: flex; flex-direction: column; gap: 10px; }
+    .checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc;
+      cursor: pointer;
+    }
+    .checkbox-item:hover { border-color: var(--primary); }
+    .checkbox-item input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+    .checkbox-item.correct { border-color: var(--success); background: var(--success-bg); }
+    .checkbox-item.wrong { border-color: var(--danger); background: var(--danger-bg); }
+
+    /* Hesablama (Numeric) */
+    .numeric-box { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .numeric-input {
+      padding: 10px 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      width: 240px;
+      outline: none;
+    }
+    .numeric-input:focus { border-color: var(--primary); }
+    .numeric-input.correct { border-color: var(--success); background: var(--success-bg); }
+    .numeric-input.wrong { border-color: var(--danger); background: var(--danger-bg); }
+
+    .feedback-box {
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .fb-ok { background: var(--success-bg); color: var(--success); }
+    .fb-err { background: var(--danger-bg); color: var(--danger); }
+
+    .bottom-submit-bar {
+      margin-top: 28px;
+      background: var(--card);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Fizika — Laboratoriya İmtahan Testi</h1>
+        <p>25 sual • Hər dəfə suallar, şərtlər və variantlar qarışdırılır</p>
+      </div>
+      <div class="controls">
+        <button class="btn-outline" onclick="shuffleAndReset()">Sualları qarışdır</button>
+        <button class="btn-outline" onclick="resetAnswers()">Sıfırla</button>
+      </div>
+    </header>
+
+    <div id="scoreBanner" class="score-banner">
+      <h2 style="font-size: 1.2rem;">İmtahan Nəticəniz</h2>
+      <div class="score-grid">
+        <div class="stat-box">
+          <div class="val" id="statFull">0 / 25</div>
+          <div class="lbl">Tam doğru suallar</div>
+        </div>
+        <div class="stat-box">
+          <div class="val" id="statCorrect">0</div>
+          <div class="lbl">Doğru bəndlər</div>
+        </div>
+        <div class="stat-box">
+          <div class="val" id="statWrong">0</div>
+          <div class="lbl">Səhv / Boş bəndlər</div>
+        </div>
+        <div class="stat-box">
+          <div class="val" id="statPercent">0%</div>
+          <div class="lbl">Nəticə faizi</div>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterCards('all', this)">Bütün suallar (25)</button>
+        <button class="filter-btn" onclick="filterCards('wrong', this)">Yalnız səhvlər</button>
+        <button class="filter-btn" onclick="filterCards('correct', this)">Yalnız doğrular</button>
+      </div>
+    </div>
+
+    <div id="quizContainer"></div>
+
+    <div class="bottom-submit-bar">
+      <span style="color: var(--muted); font-size: 0.92rem;">Bütün sualları cavablandırdıqdan sonra nəticəni yoxlayın.</span>
+      <button class="btn-primary" style="padding: 12px 26px; font-size: 1rem;" onclick="gradeExam()">İmtahanı bitir və yoxla</button>
+    </div>
+  </div>
+
+  <script>
+    const rawQuestions = [
+      {
+        id: 1,
+        type: "match",
+        title: "Mexaniki rəqslərin öyrənilməsi və riyazi rəqqas vasitəsilə ağırlıq qüvvəsi təcilinin təyini işi üçün uyğunluğu müəyyən edin:",
+        premises: [
+          "İşin məqsədinə aiddir",
+          "İşin gedişində təyin edilir",
+          "İşin nəticələrinin təhlilinə aiddir"
+        ],
+        options: {
+          a: "Ağırlıq qüvvəsi təcilini eksperimental olaraq təyin etmək",
+          b: "Sapın uzunluğunu xətkeşlə və kürənin radiusunu mikrometrlə ölçüb, rəqqasın uzunluğunu tapmaq",
+          c: "$g$ üçün orta qiymətin tapılması, mütləq və nisbi xətanın hesablanması"
+        },
+        answer: { 0: "a", 1: "b", 2: "c" }
+      },
+      {
+        id: 2,
+        type: "cloze",
+        title: "Açar sözlərdən uyğun ardıcıllıqla istifadə edərək mətni tamamlayın (sözləri bir neçə dəfə istifadə etmək olar):",
+        words: ["sərbəst rəqslər", "yaydan asılmış kürə", "məxsusi rəqslər", "məcburi rəqslər", "sönən rəqslər", "qaytarıcı qüvvə"],
+        segments: [
+          "Rəqsi hərəkət daxili və xarici qüvvələrin təsiri nəticəsində baş verə bilər. Maddi nöqtənin yalnız daxili qüvvənin təsiri altında baş verən rəqsi ",
+          " adlanır. Praktikada cismə həmişə mühitin müqavimət qüvvəsi təsir edir və bu rəqsin zəifləməsinə səbəb olur. Belə rəqslər ",
+          " adlanır. Mühitin müqavimət qüvvəsi və qaytarıcı qüvvənin təsiri altında baş verən rəqslər ",
+          " adlanır. Deməli, məxsusi rəqsləri sərbəst rəqslərin sürtünmə qüvvəsinin sıfıra yaxınlaşmasının limit halı hesab etmək olar. Sərbəst rəqslərə ",
+          " hərəkətini misal göstərmək olar. Tarazlıq vəziyyətindən çıxarılmış kürə sərbəst buraxılarsa, ",
+          " və kürənin ətalətliliyi nəticəsində rəqs etməyə başlayacaq. Periodik təsir edən xarici qüvvənin təsiri altında baş verən rəqslər ",
+          " adlanır."
+        ],
+        answers: ["məxsusi rəqslər", "sönən rəqslər", "sərbəst rəqslər", "yaydan asılmış kürə", "qaytarıcı qüvvə", "məcburi rəqslər"]
+      },
+      {
+        id: 3,
+        type: "match",
+        title: "Mexaniki rəqslərin öyrənilməsi və riyazi rəqqas vasitəsilə ağırlıq qüvvəsi təcilinin təyini işi üçün uyğunluğu müəyyən edin:",
+        premises: [
+          "$g=\\frac{4\\pi^{2}}{T^{2}}\\cdot l$",
+          "$T=2\\pi\\sqrt{\\frac{l}{g}}$",
+          "$\\omega_{0}=\\sqrt{\\frac{g}{l}}$",
+          "$\\nu=\\frac{\\omega}{2\\pi}$"
+        ],
+        options: {
+          a: "Riyazi rəqqasın rəqs periodu üçün ifadə",
+          b: "Ağırlıq qüvvəsi təcilinin riyazi ifadəsi",
+          c: "Rəqsi hərəkətin dairəvi tezliyi üçün ifadə",
+          d: "Rəqsin xətti tezliyi üçün ifadə"
+        },
+        answer: { 0: "b", 1: "a", 2: "c", 3: "d" }
+      },
+      {
+        id: 4,
+        type: "multi",
+        title: "Aşağıdakı mülahizələrdən hansı və ya hansılar doğrudur?",
+        items: [
+          "Sabit amplitudla baş verən rəqslər sönməyən, tədricən artan amplitudlu rəqslər sönən rəqslər adlanır",
+          "Sönən rəqslər sərbəst rəqslərdir",
+          "Sönməyən rəqslər həm məxsusi, həm də məcburi ola bilməz",
+          "Məcburi rəqslərin periodu məcburedici qüvvənin periodu ilə üst-üstə düşmür",
+          "Rəqsi hərəkəti kəmiyyətcə təsvir edən və müxtəlif cür rəqsləri bir-birindən ayırmağa imkan verən kəmiyyətlər rəqsi hərəkətin parametrləri adlanır",
+          "Hers — bir saniyə müddətində bir tam rəqs icra edən rəqqasın tezliyidir"
+        ],
+        correctIndices: [1, 4, 5]
+      },
+      {
+        id: 5,
+        type: "multi",
+        title: "Aşağıdakı mülahizələrdən hansı və ya hansılar doğrudur?",
+        items: [
+          "Təbiətcə elastik olmayıb, yaratdığı təsirə görə özünü elastiklik qüvvəsi kimi aparan qüvvə kvazielastiki qüvvə adlanır",
+          "Təbiətcə elastik olmayıb, yaratdığı təsirə görə özünü elastiklik qüvvəsi kimi aparan qüvvə elastiki qüvvə adlanır",
+          "Harmonik rəqsi hərəkətin dairəvi tezliyi rəqs edən sistemin xassələrindən asılı deyil, yalnız amplituddan asılıdır",
+          "Rəqsi hərəkətin enerjisi rəqsin parametrləri və rəqs edən cismin kütləsi ilə təyin olunur",
+          "Rəqsin periodu, tezliyi və amplitudu rəqsi hərəkətin parametrləri adlanırlar"
+        ],
+        correctIndices: [0, 3, 4]
+      },
+      {
+        id: 6,
+        type: "numeric",
+        title: "$x$-oxu üzərində harmonik rəqsi hərəkət edən cismin koordinatı $x(t)=4\\cos(3\\pi t+\\pi)$ ifadəsi ilə verilir. Hərəkətin başlanğıc fazasını təyin edin ($\\pi$-lərlə ifadə edin).",
+        accepted: ["1", "1pi", "pi"],
+        displayAnswer: "1 (və ya $\\pi$)",
+        unit: "$\\pi$"
+      },
+      {
+        id: 7,
+        type: "numeric",
+        title: "$x$-oxu üzərində harmonik rəqsi hərəkət edən cismin koordinatı $x(t)=4\\cos(3\\pi t+\\pi)$ (m) ifadəsi ilə verilir. Hərəkətin amplitudunu (sm-lə) təyin edin.",
+        accepted: ["400", "400sm"],
+        displayAnswer: "400 sm",
+        unit: "sm"
+      },
+      {
+        id: 8,
+        type: "numeric",
+        title: "$x$-oxu üzərində harmonik rəqsi hərəkət edən cismin koordinatı $x(t)=4\\cos(3\\pi t+\\pi)$ ifadəsi ilə verilir. Cismin $t=0,5$ san anındakı koordinatını təyin edin.",
+        accepted: ["0"],
+        displayAnswer: "0",
+        unit: "m"
+      },
+      {
+        id: 9,
+        type: "numeric",
+        title: "$x$-oxu üzərində harmonik rəqsi hərəkət edən cismin koordinatı $x(t)=4\\cos(3\\pi t+\\pi)$ ifadəsi ilə verilir. Cismin $t=1/3$ san anındakı koordinatını metrlərlə ifadə edin.",
+        accepted: ["4"],
+        displayAnswer: "4",
+        unit: "m"
+      },
+      {
+        id: 10,
+        type: "numeric",
+        title: "$x$-oxu üzərində harmonik rəqsi hərəkət edən cismin koordinatı $x(t)=4\\cos(3\\pi t+\\pi)$ ifadəsi ilə verilir. Cismin $t=0$ anındakı koordinatını təyin edin.",
+        accepted: ["-4"],
+        displayAnswer: "-4",
+        unit: "m"
+      },
+      {
+        id: 11,
+        type: "multi",
+        title: "Stoks üsulu ilə mayelərin daxili sürtünmə əmsalının təyini işində qarşıya qoyulan məqsədə aiddir:",
+        items: [
+          "Mayelərdə daxili sürtünmə əmsalının maye daxilindəki təzyiqdən asılılığını öyrənmək",
+          "Mayelərdə axın zamanı sürət qradientini tapmaq",
+          "Mayelərdə özlülüyün temperatur asılılığını təcrübi öyrənmək",
+          "Mayelərdə köçürmə prosesi ilə əlaqədar nəzəri bilikləri möhkəmləndirmək",
+          "Maye daxilində kürəciyə təsir edən ağırlıq qüvvəsini təyin etmək"
+        ],
+        correctIndices: [2, 3]
+      },
+      {
+        id: 12,
+        type: "match",
+        title: "Stoks üsulu ilə mayelərin daxili sürtünmə əmsalının təyini üzrə uyğunluğu müəyyən edin:",
+        premises: [
+          "Hərəkət edən iki maye təbəqəsi arasındakı daxili sürtünmə qüvvəsi üçün Nyuton ifadəsi",
+          "$R$ radiuslu sferik formalı cismə təsir edən sürtünmə qüvvəsi üçün Stoks düsturu",
+          "Sürət qradienti və onun Beynəlxalq sistemdə vahidi",
+          "Mayedə kürəciyə təsir edən Arximed qüvvəsi"
+        ],
+        options: {
+          a: "$\\frac{\\Delta \\vartheta}{\\Delta Z}$, $\\frac{1}{\\text{san}}$",
+          b: "$F=-\\eta\\frac{\\Delta \\vartheta}{\\Delta Z}S$",
+          c: "$F=\\rho_{2}Vg$ ($\\rho_2$ — mayenin sıxlığı)",
+          d: "$F=-6\\pi\\eta R\\vartheta$"
+        },
+        answer: { 0: "b", 1: "d", 2: "a", 3: "c" }
+      },
+      {
+        id: 13,
+        type: "match",
+        title: "Özlülük və mayedə hərəkət üzrə uyğunluğu müəyyən edin:",
+        premises: [
+          "Özlülüyün BS-də vahidi",
+          "Laboratoriya işində özlülüyü hesablamaq üçün alınmış düstur",
+          "Kürəciyə təsir edən ağırlıq qüvvəsi",
+          "Mayedə kürəciyə təsir edən əsas qüvvələr"
+        ],
+        options: {
+          a: "Ağırlıq qüvvəsi, Arximed qüvvəsi, Sürtünmə qüvvəsi",
+          b: "$F=\\rho_{1}Vg$ ($\\rho_1$ — cismin sıxlığı)",
+          c: "$\\frac{(\\rho_{1}-\\rho_{2})g d^{2}}{18\\vartheta}$",
+          d: "$\\frac{\\text{N}\\cdot\\text{san}}{\\text{m}^{2}}$"
+        },
+        answer: { 0: "d", 1: "c", 2: "b", 3: "a" }
+      },
+      {
+        id: 14,
+        type: "cloze",
+        title: "Açar sözlərdən uyğun ardıcıllıqla istifadə edərək mətni tamamlayın:",
+        words: ["özlülük", "növündən", "temperaturdan", "azalır", "artır"],
+        segments: [
+          "Daxili sürtünmə əmsalı və ya ",
+          " maddənin növündən və ",
+          " asılıdır. Belə ki, temperatur artdıqca mayelərin özlülüyü ",
+          ", qazlarda isə temperatur artdıqca özlülük ",
+          "."
+        ],
+        answers: ["özlülük", "temperaturdan", "azalır", "artır"]
+      },
+      {
+        id: 15,
+        type: "cloze",
+        title: "Açar sözlərdən uyğun ardıcıllıqla istifadə edərək mətni tamamlayın:",
+        words: ["mikrometr", "temperatur ölçəni", "nizamlayıcısını", "elektrik", "kürələri", "saniyəölçənlə"],
+        segments: [
+          "İşə başlayarkən açar ilə qurğunu ",
+          " dövrəsinə qoşmalı. Sonra isə ",
+          " və temperatur ",
+          " şəbəkəyə qoşmalı. 5-10 san müddətində qurğunun həcmində olan mayenin temperaturunu tələb olunan həddə çatdırmalı ($25^\\circ\\text{C}-45^\\circ\\text{C}$). ",
+          " vasitəsilə beş kürənin diametrini ölçməli. Borudan ",
+          " səliqə ilə maye olan həcmə buraxmalı. Kürələrin mayedə düşməsi zamanı birinci həlqədən müəyyən edilmiş həlqəyə qədər müddəti ",
+          " ölçməli."
+        ],
+        answers: ["elektrik", "temperatur ölçəni", "nizamlayıcısını", "mikrometr", "kürələri", "saniyəölçənlə"]
+      },
+      {
+        id: 16,
+        type: "numeric",
+        title: "Stoks üsulu ilə mayenin özlülüyünü təyin edərkən alınan nəticələrə ($d=2,6\\text{ mm}$, $H=30\\text{ sm}$, $g=10\\text{ m/san}^2$, $t=10\\text{ san}$, $\\rho_2=1260\\text{ kq/m}^3$, $\\rho_1=10500\\text{ kq/m}^3$) əsasən $\\eta=\\frac{(\\rho_1-\\rho_2)gd^2t}{18H}$ düsturu ilə daxili sürtünmə əmsalını hesablayın.",
+        accepted: ["1.157", "1,157", "1.16", "1,16", "11567.111", "11567,111"],
+        displayAnswer: "1,157 Pa·san (və ya vahid çevrilmədən 11567,111)",
+        unit: "Pa·san"
+      },
+      {
+        id: 17,
+        type: "numeric",
+        title: "Stoks üsulu ilə mayenin özlülüyünü təyin edərkən bərabər sürətlə düşən kürəciyə təsir edən ağırlıq qüvvəsi $2,4\\text{ mN}$, Arximed qüvvəsi isə $0,3\\text{ mN}$-dir. Daxili sürtünmə qüvvəsi neçə mN-dir?",
+        accepted: ["2.1", "2,1"],
+        displayAnswer: "2,1",
+        unit: "mN"
+      },
+      {
+        id: 18,
+        type: "match",
+        title: "Kleman və Dezorm üsulu ilə Puasson əmsalını ($\\gamma=\\frac{c_p}{c_v}$) tapmaq üçün təcrübədə əməliyyat ardıcıllığını müəyyən edin:",
+        premises: [
+          "1-ci mərhələ (İlkin təzyiqin yaradılması)",
+          "2-ci mərhələ (Adiabatik genişlənmə)",
+          "3-cü mərhələ (İzoxor qızma və hesablama)"
+        ],
+        options: {
+          a: "Kran 1 açılır, hava vurulur və $h_1$ ölçülür",
+          b: "Kran 2 açılır və bağlanır",
+          c: "$h_2$ ölçülür və $\\gamma=\\frac{h_1}{h_1-h_2}$ düsturu ilə hesablanır"
+        },
+        answer: { 0: "a", 1: "b", 2: "c" }
+      },
+      {
+        id: 19,
+        type: "numeric",
+        title: "Kleman–Dezorm üsulunda təcrübədə alınmış $h_1=20\\text{ sm}$, $h_2=6\\text{ sm}$ qiymətlərinə əsasən Puasson əmsalını $0,01$ dəqiqliklə hesablayın.",
+        accepted: ["1.43", "1,43"],
+        displayAnswer: "1,43",
+        unit: ""
+      },
+      {
+        id: 20,
+        type: "numeric",
+        title: "Kleman və Dezorm üsulu ilə havanın istilik tutumları nisbətinin təyini zamanı alınmış $\\gamma_1=1,37$, $\\gamma_2=1,45$, $\\gamma_3=1,52$ qiymətlərinə əsasən təcrübənin nisbi xətasını $0,01$ dəqiqliklə %-lə hesablayın.",
+        accepted: ["3.69", "3,69", "3.7", "3,7", "3.68", "3,68"],
+        displayAnswer: "3,69%",
+        unit: "%"
+      },
+      {
+        id: 21,
+        type: "match",
+        title: "İstilik tutumlarının Beynəlxalq sistemdə (BS) vahidləri üçün uyğunluğu müəyyən edin:",
+        premises: [
+          "İstilik tutumunun Beynəlxalq sistemdə vahidi",
+          "Xüsusi istilik tutumunun Beynəlxalq sistemdə vahidi",
+          "Molyar istilik tutumunun Beynəlxalq sistemdə vahidi"
+        ],
+        options: {
+          a: "$\\frac{\\text{C}}{\\text{kq}\\cdot\\text{K}}$",
+          b: "$\\frac{\\text{C}}{\\text{mol}\\cdot\\text{K}}$",
+          c: "$\\frac{\\text{C}}{\\text{K}}$"
+        },
+        answer: { 0: "c", 1: "a", 2: "b" }
+      },
+      {
+        id: 22,
+        type: "multi",
+        title: "Havanın istilik tutumları nisbətinin Kleman və Dezorm üsulu ilə təyini işinin məqsədi üçün hansı mülahizələr doğrudur?",
+        items: [
+          "Sərbəstlik dərəcəsini təcrübi təyin etmək",
+          "İdeal qazda izoxor və adiabatik proseslərin öyrənilməsi",
+          "Kleman və Dezorm üsulunun nəzəriyyəsinin öyrənilməsi",
+          "Havanın molyar istilik tutumları nisbətinin təcrübi təyini",
+          "Politropik prosesin öyrənilməsi"
+        ],
+        correctIndices: [1, 2, 3]
+      },
+      {
+        id: 23,
+        type: "numeric",
+        title: "Havanın istilik tutumları nisbətinin Kleman və Dezorm üsulu ilə təyinində səviyyələr fərqi üçün alınmış nəticə $h_1=18\\text{ sm}$, $h_2=4\\text{ sm}$ olmuşdur. Puasson əmsalını $0,01$ dəqiqliklə hesablayın.",
+        accepted: ["1.29", "1,29", "1.28", "1,28"],
+        displayAnswer: "1,29 (və ya 1,28)",
+        unit: ""
+      },
+      {
+        id: 24,
+        type: "cloze",
+        title: "Açar sözlərdən uyğun ardıcıllıqla istifadə edərək mətni tamamlayın:",
+        words: ["atmosfer təzyiqinə", "hermetikliyini", "B balonuna", "Səviyyələr fərqini", "Manometrdə", "K1 kranını"],
+        segments: [
+          "Təcrübəni aparmazdan əvvəl kranların ",
+          " yoxlamaq lazımdır. Sonra ",
+          " nasos vasitəsi ilə hava doldurub, balonda təzyiqi ",
+          " nisbətən 10-12 sm sütunu qədər artırıb, ",
+          " bağlamalı. ",
+          " maye sütununun qərarlaşmasını gözləyib, ",
+          " qeyd etməli."
+        ],
+        answers: ["hermetikliyini", "B balonuna", "atmosfer təzyiqinə", "K1 kranını", "Manometrdə", "Səviyyələr fərqini"]
+      },
+      {
+        id: 25,
+        type: "cloze",
+        title: "Açar sözlərdən uyğun ardıcıllıqla istifadə edərək mətni tamamlayın:",
+        words: ["ətraf mühitin", "qaz soyuyur", "adiabatik", "K2 kranını", "atmosferlə", "manometrdə"],
+        segments: [
+          "Ani olaraq ",
+          " açmalı, balondakı havanı ",
+          " əlaqələndirib sonra kranı bağlamalı. Proses ",
+          " olduğundan, bu zaman ",
+          ". 2-3 dəq. gözlədikdən sonra balondakı havanın temperaturu yüksələrək, ",
+          " temperaturuna bərabər olur. Bu zaman ",
+          " yaranan təzyiqlər fərqini $h_2$ ölçməli."
+        ],
+        answers: ["K2 kranını", "atmosferlə", "adiabatik", "qaz soyuyur", "ətraf mühitin", "manometrdə"]
+      }
+    ];
+
+    let activeQuestions = [];
+    let userState = {};
+    let isGraded = false;
+    let selectedTap = null;
+
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function prepareExam() {
+      const shuffledQs = shuffleArray(rawQuestions);
+      activeQuestions = shuffledQs.map(q => {
+        if (q.type === "match") {
+          const pIndices = shuffleArray(q.premises.map((_, i) => i));
+          const newPremises = pIndices.map(i => q.premises[i]);
+
+          const oldKeys = Object.keys(q.options);
+          const shuffledOld = shuffleArray(oldKeys);
+          const newOptions = {};
+          const oldToNew = {};
+          oldKeys.forEach((newK, idx) => {
+            const oldK = shuffledOld[idx];
+            newOptions[newK] = q.options[oldK];
+            oldToNew[oldK] = newK;
+          });
+
+          const newAnswer = {};
+          pIndices.forEach((origPIdx, newPIdx) => {
+            newAnswer[newPIdx] = oldToNew[q.answer[origPIdx]];
+          });
+
+          return {
+            ...q,
+            premises: newPremises,
+            options: newOptions,
+            answer: newAnswer
+          };
+        }
+        if (q.type === "multi") {
+          const mIndices = shuffleArray(q.items.map((_, i) => i));
+          return {
+            ...q,
+            items: mIndices.map(i => q.items[i]),
+            correctIndices: q.correctIndices.map(origIdx => mIndices.indexOf(origIdx))
+          };
+        }
+        if (q.type === "cloze") {
+          return {
+            ...q,
+            shuffledWords: shuffleArray(q.words)
+          };
+        }
+        return { ...q };
+      });
+      userState = {};
+      isGraded = false;
+      selectedTap = null;
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById("quizContainer");
+      container.innerHTML = "";
+
+      activeQuestions.forEach((q, qIdx) => {
+        const card = document.createElement("div");
+        card.className = "question-card";
+        card.id = `card-${qIdx}`;
+
+        let bodyHtml = "";
+
+        if (q.type === "match") {
+          const sel = userState[qIdx] || {};
+          const keys = Object.keys(q.options);
+          const usedVals = Object.values(sel);
+
+          const leftHtml = q.premises.map((pText, pIdx) => {
+            const chosenKey = sel[pIdx];
+            let zoneCls = "drop-zone";
+            let zoneContent = `<span class="placeholder-txt">Variantı bura sürüşdürün və ya klikləyin</span>`;
+
+            if (chosenKey) {
+              zoneCls += " filled";
+              zoneContent = `
+                <div style="display:flex;align-items:flex-start;gap:8px;">
+                  <span class="opt-letter">${chosenKey}</span>
+                  <span>${q.options[chosenKey]}</span>
+                </div>
+                ${!isGraded ? `<button type="button" class="remove-btn" onclick="clearMatch(${qIdx}, ${pIdx}, event)">×</button>` : ""}
+              `;
+            }
+
+            let fbHtml = "";
+            if (isGraded) {
+              const rightKey = q.answer[pIdx];
+              if (chosenKey === rightKey) {
+                zoneCls += " correct";
+              } else {
+                zoneCls += " wrong";
+                fbHtml = `<div class="feedback-box fb-err">Düzgün cavab: <strong>${rightKey.toUpperCase()}</strong> — ${q.options[rightKey]}</div>`;
+              }
+            }
+
+            return `
+              <div class="premise-row">
+                <div class="premise-text">
+                  <span class="premise-num">${pIdx + 1}.</span>
+                  <div>${pText}</div>
+                </div>
+                <div class="${zoneCls}"
+                     ondragover="event.preventDefault(); this.classList.add('drag-over');"
+                     ondragleave="this.classList.remove('drag-over');"
+                     ondrop="onDropMatch(event, ${qIdx}, ${pIdx})"
+                     onclick="onClickMatchZone(${qIdx}, ${pIdx})">
+                  ${zoneContent}
+                </div>
+                ${fbHtml}
+              </div>
+            `;
+          }).join("");
+
+          const rightHtml = keys.map(k => {
+            const isUsed = usedVals.includes(k);
+            const isTapSel = selectedTap && selectedTap.qIdx === qIdx && selectedTap.val === k;
+            return `
+              <div class="drag-card ${isUsed ? 'used' : ''} ${isTapSel ? 'selected-tap' : ''}"
+                   draggable="${!isGraded}"
+                   ondragstart="onDragStart(event, ${qIdx}, '${k}')"
+                   onclick="onTapOption(${qIdx}, '${k}')">
+                <span class="opt-letter">${k}</span>
+                <div>${q.options[k]}</div>
+              </div>
+            `;
+          }).join("");
+
+          bodyHtml = `
+            <div class="match-layout">
+              <div>
+                <div class="col-label">Şərtlər</div>
+                <div class="premise-list">${leftHtml}</div>
+              </div>
+              <div>
+                <div class="col-label">Variantlar</div>
+                <div class="pool-list">${rightHtml}</div>
+              </div>
+            </div>
+          `;
+        } else if (q.type === "cloze") {
+          const sel = userState[qIdx] || {};
+          const bankHtml = q.shuffledWords.map(w => {
+            const isTapSel = selectedTap && selectedTap.qIdx === qIdx && selectedTap.val === w;
+            return `
+              <div class="word-chip ${isTapSel ? 'selected-tap' : ''}"
+                   draggable="${!isGraded}"
+                   ondragstart="onDragStart(event, ${qIdx}, '${w.replace(/'/g, "\\'")}')"
+                   onclick="onTapOption(${qIdx}, '${w.replace(/'/g, "\\'")}')">
+                ${w}
+              </div>
+            `;
+          }).join("");
+
+          let textHtml = "";
+          q.segments.forEach((seg, sIdx) => {
+            textHtml += seg;
+            if (sIdx < q.answers.length) {
+              const val = sel[sIdx] || "";
+              let bCls = "inline-blank";
+              if (val) bCls += " filled";
+              if (isGraded) {
+                if (val === q.answers[sIdx]) bCls += " correct";
+                else bCls += " wrong";
+              }
+              textHtml += `<span class="${bCls}"
+                ondragover="event.preventDefault();"
+                ondrop="onDropCloze(event, ${qIdx}, ${sIdx})"
+                onclick="onClickClozeBlank(${qIdx}, ${sIdx})">${val || `(${sIdx + 1})`}</span>`;
+            }
+          });
+
+          let fbHtml = "";
+          if (isGraded) {
+            const allRight = q.answers.every((ans, i) => sel[i] === ans);
+            if (!allRight) {
+              fbHtml = `<div class="feedback-box fb-err">Düzgün ardıcıllıq: ${q.answers.map((a, i) => `<strong>${i + 1})</strong> ${a}`).join(" • ")}</div>`;
+            }
+          }
+
+          bodyHtml = `
+            <div class="word-bank">${bankHtml}</div>
+            <div class="cloze-text">${textHtml}</div>
+            ${fbHtml}
+          `;
+        } else if (q.type === "multi") {
+          const sel = userState[qIdx] || [];
+          const listHtml = q.items.map((itemText, iIdx) => {
+            const checked = sel.includes(iIdx);
+            let cls = "checkbox-item";
+            if (isGraded) {
+              const shouldCheck = q.correctIndices.includes(iIdx);
+              if (shouldCheck) cls += " correct";
+              else if (checked && !shouldCheck) cls += " wrong";
+            }
+            return `
+              <label class="${cls}">
+                <input type="checkbox" ${checked ? "checked" : ""} ${isGraded ? "disabled" : ""} onchange="toggleMulti(${qIdx}, ${iIdx})" />
+                <span>${itemText}</span>
+              </label>
+            `;
+          }).join("");
+
+          bodyHtml = `<div class="checkbox-list">${listHtml}</div>`;
+        } else if (q.type === "numeric") {
+          const val = userState[qIdx] || "";
+          let inpCls = "numeric-input";
+          let fbHtml = "";
+          if (isGraded) {
+            const norm = val.trim().toLowerCase().replace(/\s+/g, "");
+            const ok = q.accepted.some(a => a.toLowerCase() === norm);
+            if (ok) {
+              inpCls += " correct";
+              fbHtml = `<div class="feedback-box fb-ok">✓ Düzgün cavab!</div>`;
+            } else {
+              inpCls += " wrong";
+              fbHtml = `<div class="feedback-box fb-err">✕ Səhvdir. Düzgün cavab: <strong>${q.displayAnswer}</strong></div>`;
+            }
+          }
+          bodyHtml = `
+            <div class="numeric-box">
+              <input type="text" class="${inpCls}" placeholder="Cavabınızı daxil edin..." value="${val}" ${isGraded ? "disabled" : ""} oninput="setNumeric(${qIdx}, this.value)" />
+              <span style="font-weight: 700; color: var(--muted);">${q.unit}</span>
+            </div>
+            ${fbHtml}
+          `;
+        }
+
+        let statusHtml = "";
+        if (isGraded) {
+          const res = evaluateQuestion(q, qIdx);
+          card.dataset.status = res.isFull ? "correct" : "wrong";
+          statusHtml = res.isFull
+            ? `<span class="q-status status-ok">✓ Doğru</span>`
+            : `<span class="q-status status-err">✕ Səhv (${res.correct}/${res.total})</span>`;
+        }
+
+        card.innerHTML = `
+          <div class="q-header">
+            <div class="q-title"><span class="q-badge">Sual ${qIdx + 1}</span>${q.title}</div>
+            ${statusHtml}
+          </div>
+          ${bodyHtml}
+        `;
+
+        container.appendChild(card);
+      });
+
+      if (window.renderMathInElement) {
+        renderMathInElement(container, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function onDragStart(e, qIdx, val) {
+      e.dataTransfer.setData("text/plain", JSON.stringify({ qIdx, val }));
+    }
+
+    function onTapOption(qIdx, val) {
+      if (isGraded) return;
+      if (selectedTap && selectedTap.qIdx === qIdx && selectedTap.val === val) {
+        selectedTap = null;
+      } else {
+        selectedTap = { qIdx, val };
+      }
+      renderQuiz();
+    }
+
+    function onDropMatch(e, qIdx, pIdx) {
+      e.preventDefault();
+      if (isGraded) return;
+      const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+      if (data.qIdx !== qIdx) return;
+      assignMatch(qIdx, pIdx, data.val);
+    }
+
+    function onClickMatchZone(qIdx, pIdx) {
+      if (isGraded) return;
+      if (selectedTap && selectedTap.qIdx === qIdx) {
+        assignMatch(qIdx, pIdx, selectedTap.val);
+        selectedTap = null;
+      }
+    }
+
+    function assignMatch(qIdx, pIdx, val) {
+      if (!userState[qIdx]) userState[qIdx] = {};
+      Object.keys(userState[qIdx]).forEach(k => {
+        if (userState[qIdx][k] === val) delete userState[qIdx][k];
+      });
+      userState[qIdx][pIdx] = val;
+      renderQuiz();
+    }
+
+    function clearMatch(qIdx, pIdx, e) {
+      e.stopPropagation();
+      if (userState[qIdx]) delete userState[qIdx][pIdx];
+      renderQuiz();
+    }
+
+    function onDropCloze(e, qIdx, sIdx) {
+      e.preventDefault();
+      if (isGraded) return;
+      const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+      if (data.qIdx !== qIdx) return;
+      if (!userState[qIdx]) userState[qIdx] = {};
+      userState[qIdx][sIdx] = data.val;
+      renderQuiz();
+    }
+
+    function onClickClozeBlank(qIdx, sIdx) {
+      if (isGraded) return;
+      if (!userState[qIdx]) userState[qIdx] = {};
+      if (selectedTap && selectedTap.qIdx === qIdx) {
+        userState[qIdx][sIdx] = selectedTap.val;
+        selectedTap = null;
+        renderQuiz();
+      } else if (userState[qIdx][sIdx]) {
+        delete userState[qIdx][sIdx];
+        renderQuiz();
+      }
+    }
+
+    function toggleMulti(qIdx, iIdx) {
+      if (isGraded) return;
+      if (!userState[qIdx]) userState[qIdx] = [];
+      const arr = userState[qIdx];
+      const pos = arr.indexOf(iIdx);
+      if (pos >= 0) arr.splice(pos, 1);
+      else arr.push(iIdx);
+    }
+
+    function setNumeric(qIdx, val) {
+      userState[qIdx] = val;
+    }
+
+    function evaluateQuestion(q, qIdx) {
+      if (q.type === "match") {
+        const sel = userState[qIdx] || {};
+        const total = q.premises.length;
+        let correct = 0;
+        for (let i = 0; i < total; i++) {
+          if (sel[i] === q.answer[i]) correct++;
+        }
+        return { correct, total, isFull: correct === total };
+      }
+      if (q.type === "cloze") {
+        const sel = userState[qIdx] || {};
+        const total = q.answers.length;
+        let correct = 0;
+        for (let i = 0; i < total; i++) {
+          if (sel[i] === q.answers[i]) correct++;
+        }
+        return { correct, total, isFull: correct === total };
+      }
+      if (q.type === "multi") {
+        const sel = userState[qIdx] || [];
+        const total = q.correctIndices.length;
+        const rightPicked = sel.filter(i => q.correctIndices.includes(i)).length;
+        const wrongPicked = sel.filter(i => !q.correctIndices.includes(i)).length;
+        const isFull = rightPicked === total && wrongPicked === 0;
+        return { correct: Math.max(0, rightPicked - wrongPicked), total, isFull };
+      }
+      if (q.type === "numeric") {
+        const val = (userState[qIdx] || "").trim().toLowerCase().replace(/\s+/g, "");
+        const ok = q.accepted.some(a => a.toLowerCase() === val);
+        return { correct: ok ? 1 : 0, total: 1, isFull: ok };
+      }
+      return { correct: 0, total: 1, isFull: false };
+    }
+
+    function gradeExam() {
+      isGraded = true;
+      selectedTap = null;
+      let fullCount = 0;
+      let totalCorrect = 0;
+      let totalPossible = 0;
+
+      activeQuestions.forEach((q, idx) => {
+        const res = evaluateQuestion(q, idx);
+        if (res.isFull) fullCount++;
+        totalCorrect += res.correct;
+        totalPossible += res.total;
+      });
+
+      document.getElementById("statFull").textContent = `${fullCount} / ${activeQuestions.length}`;
+      document.getElementById("statCorrect").textContent = totalCorrect;
+      document.getElementById("statWrong").textContent = totalPossible - totalCorrect;
+      document.getElementById("statPercent").textContent = `${Math.round((totalCorrect / totalPossible) * 100)}%`;
+      document.getElementById("scoreBanner").classList.add("show");
+
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function filterCards(mode, btn) {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelectorAll(".question-card").forEach(card => {
+        if (mode === "all") card.classList.remove("hidden");
+        else if (mode === "wrong") card.classList.toggle("hidden", card.dataset.status !== "wrong");
+        else if (mode === "correct") card.classList.toggle("hidden", card.dataset.status !== "correct");
+      });
+    }
+
+    function resetAnswers() {
+      userState = {};
+      isGraded = false;
+      selectedTap = null;
+      document.getElementById("scoreBanner").classList.remove("show");
+      renderQuiz();
+    }
+
+    function shuffleAndReset() {
+      prepareExam();
+      document.getElementById("scoreBanner").classList.remove("show");
+      renderQuiz();
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      prepareExam();
+      renderQuiz();
+    });
+  </script>
+</body>
+</html>
